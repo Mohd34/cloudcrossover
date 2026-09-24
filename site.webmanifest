@@ -1,0 +1,16 @@
+{
+  "name": "CloudCrossover — Serverless vs VPS Cost & Break-Even Engine",
+  "short_name": "CloudCrossover",
+  "description": "Calculate exact cloud cost crossover points between AWS Lambda, Cloud Run, and VPS hosting.",
+  "start_url": "/cloudcrossover/index.html",
+  "display": "standalone",
+  "background_color": "#0b0f19",
+  "theme_color": "#0b0f19",
+  "icons": [
+    {
+      "src": "assets/img/favicon.svg",
+      "sizes": "64x64 128x128 256x256",
+      "type": "image/svg+xml"
+    }
+  ]
+}

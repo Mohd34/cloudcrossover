@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CloudCrossover — Serverless vs VPS Cost & Break-Even Engine</title>
+  <meta name="description" content="Calculate the exact invocation break-even crossover point between AWS Lambda, Google Cloud Run, EC2, DigitalOcean, and Hetzner. Export markdown comparison tables and ADRs for engineering teams.">
+  <link rel="canonical" href="https://mohd34.github.io/cloudcrossover/">
+  <meta name="theme-color" content="#0b0f19">
+
+  <!-- Open Graph / Social Cards -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mohd34.github.io/cloudcrossover/">
+  <meta property="og:title" content="CloudCrossover — Serverless vs VPS Cost & Break-Even Engine">
+  <meta property="og:description" content="At what request volume does Serverless flip from cheap to unaffordable? Calculate exact crossover break-even points across AWS Lambda, Cloud Run, EC2, and Hetzner.">
+  <meta property="og:image" content="https://mohd34.github.io/cloudcrossover/assets/img/favicon.svg">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="CloudCrossover — Serverless vs VPS Cost & Break-Even Engine">
+  <meta name="twitter:description" content="Calculate exact cloud cost crossover points between Lambda, Cloud Run, and VPS. 1-click Markdown export for PRs, RFCs, and ADRs.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Site Navigation Header -->
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="index.html" class="brand">
+        <img src="assets/img/favicon.svg" alt="CloudCrossover Logo" class="brand-icon">
+        <span>CloudCrossover</span>
+        <span class="brand-badge">v1.0</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link active">Calculator</a>
+        <a href="crossover-guide.html" class="nav-link">Crossover Guide</a>
+        <a href="adr-generator.html" class="nav-link">ADR Generator</a>
+        <a href="https://github.com/Mohd34/cloudcrossover" target="_blank" rel="noopener noreferrer" class="nav-link">GitHub</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark/light theme" title="Toggle theme">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="container">
+    <section class="hero">
+      <div class="hero-pill">⚡ 2026 Cloud Cost & Break-Even Modeling</div>
+      <h1>Serverless vs. VPS <span class="gradient-text">Break-Even Engine</span></h1>
+      <p class="lead">
+        Compute the exact invocation threshold where AWS Lambda & Cloud Run flip to being vastly more expensive than fixed VPS or container instances. Built for engineering teams, RFCs, and budget reviews.
+      </p>
+
+      <!-- Workload Presets -->
+      <div class="presets-bar">
+        <span class="preset-label">Workload Presets:</span>
+        <button type="button" class="preset-btn active" data-preset="contentApi">Content API (10M req)</button>
+        <button type="button" class="preset-btn" data-preset="webhook">Webhook Ingest (50M req)</button>
+        <button type="button" class="preset-btn" data-preset="microservice">Microservice (2M req)</button>
+        <button type="button" class="preset-btn" data-preset="heavyCompute">Compute-Heavy (5M req)</button>
+        <button type="button" class="preset-btn" data-preset="sideProject">Side Project (250K req)</button>
+      </div>
+    </section>
+
+    <!-- Main Grid: Controls + Results -->
+    <div class="app-grid">
+      
+      <!-- Left Column: Workload Sliders -->
+      <aside class="panel">
+        <div class="panel-title">
+          <h2>Workload Parameters</h2>
+          <span style="font-size: 0.8rem; color: var(--text-dim);" class="mono">Monthly Profile</span>
+        </div>
+
+        <!-- 1. Requests Slider -->
+        <div class="control-group">
+          <div class="control-header">
+            <label for="input-requests-slider">Monthly Invocations</label>
+            <span id="val-requests" class="control-val-badge">10.0M reqs/mo</span>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" id="input-requests-slider" min="100000" max="100000000" step="100000" value="10000000" aria-label="Monthly Invocations">
+          </div>
+          <div class="control-ticks">
+            <span>100K</span>
+            <span>25M</span>
+            <span>50M</span>
+            <span>100M</span>
+          </div>
+        </div>
+
+        <!-- 2. Execution Duration Slider -->
+        <div class="control-group">
+          <div class="control-header">
+            <label for="input-duration-slider">Avg Execution Duration</label>
+            <span id="val-duration" class="control-val-badge">150 ms</span>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" id="input-duration-slider" min="10" max="3000" step="10" value="150" aria-label="Execution Duration">
+          </div>
+          <div class="control-ticks">
+            <span>10ms</span>
+            <span>500ms</span>
+            <span>1500ms</span>
+            <span>3000ms</span>
+          </div>
+        </div>
+
+        <!-- 3. Memory Allocation Slider -->
+        <div class="control-group">
+          <div class="control-header">
+            <label for="input-memory-slider">Memory Allocation</label>
+            <span id="val-memory" class="control-val-badge">512 MB</span>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" id="input-memory-slider" min="128" max="4096" step="128" value="512" aria-label="Memory Allocation">
+          </div>
+          <div class="control-ticks">
+            <span>128MB</span>
+            <span>1024MB</span>
+            <span>2048MB</span>
+            <span>4096MB</span>
+          </div>
+        </div>
+
+        <!-- 4. CPU Architecture -->
+        <div class="control-group">
+          <div class="control-header">
+            <label>CPU Architecture</label>
+            <span class="mono" style="font-size:0.75rem; color:var(--text-dim)">AWS Graviton vs x86</span>
+          </div>
+          <div class="toggle-group">
+            <button type="button" id="btn-arch-arm" class="toggle-btn active">ARM64 (Graviton)</button>
+            <button type="button" id="btn-arch-x86" class="toggle-btn">x86_64 (Intel/AMD)</button>
+          </div>
+        </div>
+
+        <!-- 5. API Gateway Protocol -->
+        <div class="control-group">
+          <div class="control-header">
+            <label>API Gateway Protocol</label>
+            <span class="mono" style="font-size:0.75rem; color:var(--text-dim)">AWS Front Door</span>
+          </div>
+          <div class="toggle-group">
+            <button type="button" class="toggle-btn btn-gateway active" data-gateway="http">HTTP API ($1/M)</button>
+            <button type="button" class="toggle-btn btn-gateway" data-gateway="rest">REST API ($3.5/M)</button>
+            <button type="button" class="toggle-btn btn-gateway" data-gateway="none">None / Direct</button>
+          </div>
+        </div>
+
+        <!-- 6. Outbound Data Egress -->
+        <div class="control-group">
+          <div class="control-header">
+            <label for="input-egress-slider">Monthly Internet Egress</label>
+            <span id="val-egress" class="control-val-badge">1200 GB</span>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" id="input-egress-slider" min="0" max="5000" step="50" value="1200" aria-label="Monthly Internet Egress">
+          </div>
+          <div class="control-ticks">
+            <span>0 GB</span>
+            <span>1,000 GB</span>
+            <span>2,500 GB</span>
+            <span>5,000 GB</span>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- Right Column: Results & Comparisons -->
+      <section class="results-area">
+        
+        <!-- Crossover Break-Even Callout Banner -->
+        <div class="crossover-banner">
+          <span class="crossover-badge">Break-Even Decision Threshold</span>
+          <div id="crossover-text" class="crossover-heading">
+            Computing economic crossover point...
+          </div>
+          <p style="font-size: 0.9rem; margin-top: 0.25rem;">
+            At what request volume does Serverless compute spend exceed fixed VPS server costs?
+          </p>
+
+          <div class="crossover-stats">
+            <div class="crossover-stat-item">
+              <div class="stat-label">Crossover vs Hetzner CX22</div>
+              <div id="crossover-hetzner-val" class="stat-value">--</div>
+              <div class="stat-sub">€3.79/mo (~$4.15 USD)</div>
+            </div>
+
+            <div class="crossover-stat-item">
+              <div class="stat-label">Crossover vs DigitalOcean</div>
+              <div id="crossover-do-val" class="stat-value">--</div>
+              <div class="stat-sub">$6.00/mo Basic Droplet</div>
+            </div>
+
+            <div class="crossover-stat-item">
+              <div class="stat-label">Crossover vs EC2 + ALB</div>
+              <div id="crossover-ec2-val" class="stat-value">--</div>
+              <div class="stat-sub">$34.69/mo t4g.small + ALB</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Provider Comparison Cards Grid -->
+        <div id="provider-cards-grid" class="provider-cards-grid">
+          <!-- Dynamically populated by app.js -->
+        </div>
+
+        <!-- Visual Comparison Bar Chart -->
+        <div class="chart-panel">
+          <div class="chart-title">
+            <span>Monthly Cost Comparison</span>
+            <span class="mono" style="font-size: 0.8rem; color: var(--text-dim);">Lower is better</span>
+          </div>
+          <div id="chart-bars-container">
+            <!-- Dynamically populated by app.js -->
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- Built-in Distribution & Sharing Hub -->
+    <section class="share-hub">
+      <div class="share-hub-header">
+        <div>
+          <h2>Export & Share Analysis</h2>
+          <p>Instantly copy Markdown tables for GitHub PRs, discussion snippets for Reddit/Discord, or download an ADR.</p>
+        </div>
+        <div class="share-hub-actions">
+          <button type="button" id="btn-copy-url" class="btn btn-secondary">🔗 Copy URL</button>
+          <button type="button" id="btn-copy-md" class="btn btn-primary">📋 Copy GitHub PR Table</button>
+          <button type="button" id="btn-copy-reddit" class="btn btn-secondary">💬 Copy Reddit Snippet</button>
+          <button type="button" id="btn-download-adr" class="btn btn-accent">📥 Download ADR (.md)</button>
+        </div>
+      </div>
+
+      <div id="share-preview" class="share-preview-box">
+        <!-- Live Markdown preview generated by app.js -->
+      </div>
+    </section>
+
+    <!-- Hidden Cloud Cost Traps Audit -->
+    <section class="traps-section">
+      <h2>The 3 Hidden Cloud Cost Traps</h2>
+      <p>Serverless calculators often omit the infrastructural side effects that drive 60–80% of unexpected cloud bills.</p>
+
+      <div class="traps-grid">
+        <div class="trap-card">
+          <span class="trap-pill">AWS NAT Gateway Tax</span>
+          <h3>Private Subnet Egress</h3>
+          <p>
+            Placing AWS Lambda inside a VPC to access RDS or ElastiCache requires an AWS NAT Gateway for external API calls.
+          </p>
+          <p>
+            <strong>Fixed tax:</strong> $32.85/mo per AZ idle fee + $0.045/GB processed.
+          </p>
+          <div style="font-size: 0.85rem; color: var(--accent-rose); font-family: var(--font-mono);">
+            Impact on current workload: <span id="trap-nat-cost" style="font-weight: 700;">$32.85/mo</span>
+          </div>
+        </div>
+
+        <div class="trap-card">
+          <span class="trap-pill">API Gateway Multiplier</span>
+          <h3>REST vs HTTP API Gateway</h3>
+          <p>
+            Legacy AWS REST API Gateways charge $3.50 per million calls. Migrating to HTTP API Gateway drops this to $1.00/M. Fixed VPS instances charge $0 for API routing.
+          </p>
+          <div style="font-size: 0.85rem; color: var(--accent-rose); font-family: var(--font-mono);">
+            Current REST penalty: <span id="trap-rest-cost" style="font-weight: 700;">+$25.00/mo</span>
+          </div>
+        </div>
+
+        <div class="trap-card">
+          <span class="trap-pill">Bandwidth Extortion</span>
+          <h3>Data Egress Markups</h3>
+          <p>
+            AWS charges $0.09/GB for public egress. Hetzner includes 20,000 GB free (€1.10/TB overage). DigitalOcean includes 1,000–4,000 GB free ($0.01/GB overage).
+          </p>
+          <div style="font-size: 0.85rem; color: var(--accent-rose); font-family: var(--font-mono);">
+            AWS egress on current workload: <span id="trap-egress-cost" style="font-weight: 700;">$99.00/mo</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Frequently Asked Questions & Technical Methodology -->
+    <section class="faq-section">
+      <h2>Methodology & Frequently Asked Questions</h2>
+      <div class="faq-grid">
+        <div class="faq-card">
+          <h3>How is the Crossover Point (R*) computed?</h3>
+          <p>
+            We model the total marginal cost per request: \(c_{\text{req}} = (\text{duration} \times \text{memory} \times \text{rate}_{\text{arch}}) + \text{rate}_{\text{invoke}} + \text{rate}_{\text{gateway}}\). The break-even point R* is calculated by solving where the cumulative serverless bill equals the fixed monthly fee of a VPS instance, accounting for AWS free tiers.
+          </p>
+        </div>
+
+        <div class="faq-card">
+          <h3>Does this account for developer maintenance hours?</h3>
+          <p>
+            Serverless eliminates Linux patching and OS administration. However, modern deployment tools like <strong>Kamal</strong>, <strong>Coolify</strong>, and <strong>Docker Compose</strong> have reduced VPS maintenance to minutes per month, making the financial savings of VPS compelling past 2M–5M requests.
+          </p>
+        </div>
+
+        <div class="faq-card">
+          <h3>Why does AWS Lambda get expensive so fast?</h3>
+          <p>
+            Invocations and compute are cheap in isolation, but combined with API Gateway ($1.00–$3.50/M) and data egress ($0.09/GB), high-volume workloads pay a recurring tax on every single packet. A $4 VPS can easily handle 500 requests per second with nginx or Go.
+          </p>
+        </div>
+
+        <div class="faq-card">
+          <h3>What about cold starts and latency?</h3>
+          <p>
+            Serverless runtimes incur 100ms–2000ms cold starts when scaling from zero or after idle periods. VPS and container instances remain warm 24/7, providing consistent sub-5ms internal response latencies.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>CloudCrossover</h4>
+          <p>An open-source financial decision engine for software engineers, DevOps leads, and FinOps architects. 100% free, zero tracking, zero paywalls.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="crossover-guide.html">Crossover Architecture Guide</a></li>
+            <li><a href="adr-generator.html">ADR Decision Record Builder</a></li>
+            <li><a href="https://github.com/Mohd34/cloudcrossover" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal & Privacy</h4>
+          <ul>
+            <li><a href="legal/privacy.html">Privacy Policy</a></li>
+            <li><a href="legal/terms.html">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>© 2026 CloudCrossover. Open source under MIT License.</div>
+        <div class="mono">Rates updated September 2026</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Popup -->
+  <div id="toast" class="toast" role="status" aria-live="polite">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span id="toast-msg">Copied to clipboard!</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/js/calculators.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

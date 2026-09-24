@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mohd34.github.io/cloudcrossover/sitemap.xml

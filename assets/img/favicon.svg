@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="cloudGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+    <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="64" height="64" rx="14" fill="#0f172a" />
+  
+  <!-- Cloud Silhouette -->
+  <path d="M44 34c0-4.4-3.6-8-8-8-1.1 0-2.2.2-3.2.7C31.5 23.3 27.5 21 23 21c-6.1 0-11 4.9-11 11 0 .6.1 1.2.2 1.8C9.7 34.6 8 37.1 8 40c0 4.4 3.6 8 8 8h28c5.5 0 10-4.5 10-10 0-5.1-3.8-9.3-8.8-9.9.5-1.3.8-2.7.8-4.1z" fill="url(#cloudGrad)" opacity="0.35"/>
+  
+  <!-- Crossover Lines -->
+  <!-- Serverless Curve (Starts at 0, slopes steep upward) -->
+  <path d="M12 48 C 24 46, 32 36, 52 14" stroke="#f43f5e" stroke-width="4" stroke-linecap="round" fill="none" />
+  
+  <!-- Fixed VPS Line (Horizontal baseline) -->
+  <path d="M12 36 L 52 36" stroke="#10b981" stroke-width="4" stroke-linecap="round" stroke-dasharray="2 3" fill="none" />
+  
+  <!-- Crossover Node (Intersection Point) -->
+  <circle cx="34" cy="36" r="5" fill="#facc15" stroke="#0f172a" stroke-width="2" />
+  <circle cx="34" cy="36" r="2" fill="#0f172a" />
+</svg>
