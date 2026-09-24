@@ -23,6 +23,67 @@
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
   <link rel="stylesheet" href="assets/css/style.css">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://mohd34.github.io/cloudcrossover/#webapp",
+        "name": "CloudCrossover",
+        "description": "Serverless vs VPS cost and break-even financial modeling engine for AWS Lambda, Google Cloud Run, EC2, DigitalOcean, and Hetzner.",
+        "url": "https://mohd34.github.io/cloudcrossover/",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "All",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://mohd34.github.io/cloudcrossover/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How is the Crossover Point (R*) computed?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "We model the total marginal cost per request: c_req = (duration * memory * rate_arch) + rate_invoke + rate_gateway. The break-even point R* is calculated by solving where the cumulative serverless bill equals the fixed monthly fee of a VPS instance, accounting for AWS free tiers."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does this account for developer maintenance hours?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Serverless eliminates Linux patching and OS administration. However, modern deployment tools like Kamal, Coolify, and Docker Compose have reduced VPS maintenance to minutes per month, making the financial savings of VPS compelling past 2M–5M requests."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why does AWS Lambda get expensive so fast?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Invocations and compute are cheap in isolation, but combined with API Gateway ($1.00–$3.50/M) and data egress ($0.09/GB), high-volume workloads pay a recurring tax on every single packet. A $4 VPS can easily handle 500 requests per second with nginx or Go."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What about cold starts and latency?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Serverless runtimes incur 100ms–2000ms cold starts when scaling from zero or after idle periods. VPS and container instances remain warm 24/7, providing consistent sub-5ms internal response latencies."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 
